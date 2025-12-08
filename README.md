@@ -29,6 +29,10 @@ This folder includes:
 - Example management interface images (e.g., reboot button).
 
 ---
+### Hardware Setup
+![Hardware Photo 1](images/1000017518.jpg)
+![Hardware Photo 2](images/1000017520.jpg)
+![Hardware Photo 3](images/1000017521.jpg)
 
 ## Hardware Components
 - Raspberry Pi Pico W (Wi-Fi capable, onboard LED indicator)  
@@ -62,5 +66,14 @@ The Pico W hosts a simple **HTTP server** accessible via the local network.
 Features include:  
 - Real-time monitoring of sensor variables  
 - Viewing last recorded data points  
-- Rebooting the Pico remotely  
+- Rebooting the Pico remotely
+
+#### Dashboard
+![Dashboard](images/Dashboard.png)
+
+#### Data Page
+![Data Page](images/Data_page.png)
+
+#### Reboot Management
+![Reboot](images/Reboot.png)
 
