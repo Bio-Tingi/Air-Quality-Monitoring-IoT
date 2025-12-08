@@ -1,5 +1,4 @@
 # Air-Quality-Monitoring-IoT
-Quality Monitoring IoT Project
 
 ##  Overview
 This project is an **IoT-based indoor air quality monitoring system** built using a **Raspberry Pi Pico W**, a **BME680 environmental sensor** (DFRobot), and a **Grove 16x2 LCD screen (blue on white)**.  
