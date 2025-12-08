@@ -10,6 +10,24 @@ It measures **temperature, humidity, pressure, and gas resistance**, processes t
 
 The system displays real-time data on the LCD and hosts a local **HTTP server** for remote monitoring and device management.
 
+### Main Scripts
+- **main.py** – The primary application script that runs the indoor air quality monitoring system.
+- **bme680.py** – Driver for the BME680 sensor, handling temperature, humidity, pressure, and gas resistance readings.
+- **lcd_driver.py** – Driver for the Grove 16x2 LCD screen, managing I²C communication and display output.
+
+### Data Folder (`/data`)
+This folder contains files used for storing credentials and sensor data:
+- **key.json** – Holds Wi-Fi credentials and other necessary configuration values for Pico W to connect to the internet.
+- **data.json** – Stores the last recorded data points from the sensor for reference and logging.
+- **last_values.json** – Contains the most recent system state variables (e.g., chip temperature, device type, time, date, uptime, Wi-Fi status).  
+  These values are saved so the system can restore or reference them after a reboot.
+
+### Images Folder (`/images`)
+This folder includes:
+- Screenshots of the local web server interface.  
+- Photos of the assembled hardware setup (Pico W, BME680 sensor, Grove LCD).  
+- Example management interface images (e.g., reboot button).
+
 ---
 
 ## Hardware Components
