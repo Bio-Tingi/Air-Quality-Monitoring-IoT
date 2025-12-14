@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Air Quality Monitor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #ffffff;
+            color: #000000;
+            min-height: 100vh;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 60px 40px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        h1 {
+            color: #000000;
+            font-size: 3.5rem;
+            font-weight: 300;
+            margin-bottom: 16px;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+        }
+
+        .subtitle {
+            color: #666666;
+            font-size: 1.125rem;
+            font-weight: 400;
+            letter-spacing: 0.01em;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 2px;
+            margin-bottom: 80px;
+            background: #e5e5e5;
+            padding: 2px;
+        }
+
+        .stat-card {
+            background: #ffffff;
+            padding: 48px 40px;
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+            border: none;
+        }
+
+        .stat-card:hover {
+            background: #f8f8f8;
+            transform: scale(1.02);
+        }
+
+        .stat-label {
+            color: #666666;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+        }
+
+        .stat-value {
+            font-size: 3.5rem;
+            font-weight: 200;
+            color: #000000;
+            line-height: 1;
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
+        }
+
+        .stat-unit {
+            font-size: 1.25rem;
+            color: #999999;
+            font-weight: 300;
+            margin-left: 6px;
+        }
+
+        .timestamp {
+            color: #999999;
+            font-size: 0.75rem;
+            margin-top: 16px;
+            font-weight: 400;
+            letter-spacing: 0.02em;
+        }
+
+        .timestamp::before {
+            content: '●';
+            color: #000000;
+            margin-right: 8px;
+            animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .readings-table {
+            background: #ffffff;
+            padding: 60px 40px;
+        }
+
+        .readings-table h2 {
+            color: #000000;
+            margin-bottom: 40px;
+            font-size: 2rem;
+            font-weight: 300;
+            letter-spacing: -0.02em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 20px 16px;
+            text-align: left;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        th {
+            color: #666666;
+            font-weight: 500;
+            font-size: 0.8125rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        td {
+            color: #000000;
+            font-size: 0.9375rem;
+            font-weight: 400;
+        }
+
+        tbody tr {
+            transition: background 0.3s ease;
+        }
+
+        tbody tr:hover {
+            background: #fafafa;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .error-message {
+            background: #fff5f5;
+            color: #c81e1e;
+            padding: 24px;
+            border-radius: 0;
+            margin: 40px 0;
+            border-left: 3px solid #c81e1e;
+            font-size: 0.9375rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 100px 20px;
+            color: #666666;
+            font-size: 1rem;
+            font-weight: 400;
+        }
+
+        .loading::after {
+            content: '';
+            display: block;
+            width: 32px;
+            height: 32px;
+            margin: 32px auto;
+            border: 2px solid #e5e5e5;
+            border-top-color: #000000;
+            border-radius: 50%;
+            animation: spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                padding: 40px 24px;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .stats-grid {
+                gap: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 32px 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            .stat-value {
+                font-size: 2.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-card {
+                padding: 32px 24px;
+            }
+
+            .readings-table {
+                padding: 40px 20px;
+            }
+
+            th, td {
+                padding: 16px 12px;
+                font-size: 0.875rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Air Quality Monitor</h1>
+            <p class="subtitle">Real-time environmental sensing</p>
+        </header>
+
+        <div id="loading" class="loading" style="display:none;">Loading data...</div>
+        <div id="error" class="error-message" style="display:none;"></div>
+
+        <div id="currentData" style="display:none;">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Temperature</div>
+                    <div class="stat-value"><span id="temp">--</span><span class="stat-unit">°C</span></div>
+                    <div class="timestamp" id="tempTime"></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Humidity</div>
+                    <div class="stat-value"><span id="humidity">--</span><span class="stat-unit">%</span></div>
+                    <div class="timestamp" id="humidityTime"></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Pressure</div>
+                    <div class="stat-value"><span id="pressure">--</span><span class="stat-unit">hPa</span></div>
+                    <div class="timestamp" id="pressureTime"></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Gas Resistance</div>
+                    <div class="stat-value"><span id="gas">--</span><span class="stat-unit">Ω</span></div>
+                    <div class="timestamp" id="gasTime"></div>
+                </div>
+            </div>
+
+            <div class="readings-table">
+                <h2>Recent Readings</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Temperature (°C)</th>
+                            <th>Humidity (%)</th>
+                            <th>Pressure (hPa)</th>
+                            <th>Gas (Ω)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="readingsBody">
+                        <tr><td colspan="5" style="text-align:center;">No data yet</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let projectId = 'climate-app-9baca';
+        let apiKey = 'AIzaSyBG-PdjQ0hG5vVV1HaTsSMLa5fZdZIbRd8';
+        let collectionName = 'air_quality_readings';
+        let refreshInterval = null;
+
+        function connectFirestore() {
+            // Use the global variables directly since form was removed
+            if (!projectId || !apiKey) {
+                showError('Configuration missing');
+                return;
+            }
+
+            // Save to localStorage
+            localStorage.setItem('projectId', projectId);
+            localStorage.setItem('apiKey', apiKey);
+            localStorage.setItem('collectionName', collectionName);
+
+            // Start fetching data
+            fetchData();
+
+            // Auto-refresh every 10 seconds
+            if (refreshInterval) clearInterval(refreshInterval);
+            refreshInterval = setInterval(fetchData, 10000);
+        }
+
+        async function fetchData() {
+            const url = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/${collectionName}?key=${apiKey}&pageSize=20&orderBy=timestamp desc`;
+            
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('error').style.display = 'none';
+
+            try {
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                
+                if (!data.documents || data.documents.length === 0) {
+                    showError('No data found in Firestore. Make sure your device is uploading data.');
+                    return;
+                }
+
+                displayData(data.documents);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('currentData').style.display = 'block';
+
+            } catch (error) {
+                showError(`Error fetching data: ${error.message}`);
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        function displayData(documents) {
+            if (documents.length === 0) {
+                showError('No readings available');
+                return;
+            }
+
+            // Display latest reading in cards
+            const latest = documents[0].fields;
+            const temp = latest.temperature_C?.doubleValue || 0;
+            const humidity = latest.humidity_percent?.doubleValue || 0;
+            const pressure = latest.pressure_hPa?.doubleValue || 0;
+            const gas = latest.gas_ohms?.integerValue || 0;
+            const timestamp = latest.timestamp?.stringValue || 'Unknown';
+
+            document.getElementById('temp').textContent = temp.toFixed(1);
+            document.getElementById('humidity').textContent = humidity.toFixed(1);
+            document.getElementById('pressure').textContent = pressure.toFixed(1);
+            document.getElementById('gas').textContent = parseInt(gas).toLocaleString();
+            
+            document.querySelectorAll('.timestamp').forEach(el => {
+                el.textContent = timestamp;
+            });
+
+            // Display table of recent readings
+            const tbody = document.getElementById('readingsBody');
+            tbody.innerHTML = '';
+
+            documents.forEach(doc => {
+                const fields = doc.fields;
+                const row = tbody.insertRow();
+                row.insertCell(0).textContent = fields.timestamp?.stringValue || 'N/A';
+                row.insertCell(1).textContent = (fields.temperature_C?.doubleValue || 0).toFixed(1);
+                row.insertCell(2).textContent = (fields.humidity_percent?.doubleValue || 0).toFixed(1);
+                row.insertCell(3).textContent = (fields.pressure_hPa?.doubleValue || 0).toFixed(1);
+                row.insertCell(4).textContent = parseInt(fields.gas_ohms?.integerValue || 0).toLocaleString();
+            });
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        // Load saved configuration on page load
+        window.addEventListener('load', () => {
+            const savedProject = localStorage.getItem('projectId');
+            const savedKey = localStorage.getItem('apiKey');
+            const savedCollection = localStorage.getItem('collectionName');
+
+            // Use saved or default values
+            projectId = savedProject || 'climate-app-9baca';
+            apiKey = savedKey || 'AIzaSyBG-PdjQ0hG5vVV1HaTsSMLa5fZdZIbRd8';
+            collectionName = savedCollection || 'air_quality_readings';
+
+            // Auto-connect on page load
+            connectFirestore();
+        });
+    </script>
+</body>
+</html>

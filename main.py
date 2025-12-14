@@ -1,11 +1,13 @@
 # main.py
 # Pico W: LCD dashboard + non-blocking Wi‑Fi + LED status + DST local time (FI) +
 # hourly NTP sync + web server with / (HTML) and /data (JSON) + sensor logging
+# Firebase sync every minute
 
 from machine import I2C, Pin, RTC, ADC
 import time, ujson, network, ntptime, socket
 import lcd_driver
 from bme680 import *
+from firebase_sync import FirebaseSync, load_firebase_config
 
 # --- IAQ calculation ---
 def calculate_iaq(humidity, gas_res):
@@ -96,12 +98,22 @@ except Exception:
     
 connect_wifi()
 
+# --- Firestore setup ---
+project_id, api_key = load_firebase_config()
+firebase = None
+if project_id and api_key:
+    firebase = FirebaseSync(project_id, api_key)
+    print("Firestore configured:", project_id)
+else:
+    print("Firestore not configured - skipping sync")
+
 # --- State ---
 modes = ["AIRTEMP", "HUMPRESS"]
 idx = 0
 start_time = time.time()
 last_wifi_attempt = 0
 last_ntp_sync = 0
+last_firebase_sync = 0  # Track last Firebase sync time
 
 # --- Web server setup (non-blocking accept)
 PORT = 80
@@ -169,6 +181,22 @@ while True:
     with open("data.json", "w") as f:
         ujson.dump(sensor_log, f)
 
+    # Save latest reading to pending_upload.json for Firebase sync
+    pending_data = {
+        "timestamp": "{:04d}-{:02d}-{:02d}T{:02d}:{:02d}:{:02d}".format(
+            local[0], local[1], local[2], local[3], local[4], local[5]
+        ),
+        "temperature_C": round(temp, 2),
+        "humidity_%": round(hum, 2),
+        "pressure_hPa": round(pres, 1),
+        "gas_ohms": int(gas)
+    }
+    try:
+        with open("pending_upload.json", "w") as f:
+            ujson.dump(pending_data, f)
+    except Exception as e:
+        print(f"Error saving pending upload: {e}")
+
     # Save system info (UTC) for last_values.json
     sys_data = {
         "time": "{:02d}:{:02d}".format(utc[3], utc[4]),
@@ -191,7 +219,7 @@ while True:
     lcd_driver.lcd_write_line(i2c, 0, line_1)
     lcd_driver.lcd_write_line(i2c, 1, line_2)
 
-    # Wi‑Fi retry every 60s; hourly NTP sync
+    # Wi‑Fi retry every 60s; hourly NTP sync; Firebase sync every 60s
     if (time.time() - last_wifi_attempt) > 60:
         if not wlan.isconnected():
             connect_wifi()
@@ -204,6 +232,23 @@ while True:
                 except Exception:
                     print("NTP sync failed")
         last_wifi_attempt = time.time()
+    
+    # Firestore sync every 60 seconds (only when WiFi is connected)
+    if firebase and wlan.isconnected() and (time.time() - last_firebase_sync) > 60:
+        try:
+            with open("pending_upload.json", "r") as f:
+                upload_data = ujson.load(f)
+            
+            # Send to Firestore - creates a new document with auto-generated ID
+            if firebase.send_data("air_quality_readings", upload_data):
+                print(f"Firestore sync OK: {upload_data['timestamp']}")
+            else:
+                print("Firestore sync failed - will retry in 60s")
+                
+        except Exception as e:
+            print(f"Firestore sync error: {e}")
+        
+        last_firebase_sync = time.time()
 
     # Web server (non-blocking accept)
     
