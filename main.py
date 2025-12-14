@@ -56,7 +56,7 @@ def localtime_with_dst():
              (month == 10 and day <= dst_end_day)
     offset_hours = 3 if in_dst else 2
     return time.localtime(time.time() + offset_hours * 3600)
-
+time.sleep(4)
 # --- Hardware setup ---
 i2c = I2C(0, sda=Pin(0), scl=Pin(1), freq=100000)
 lcd_driver.lcd_init(i2c)
@@ -141,6 +141,9 @@ while True:
         led.value(1)
         led_state = 1
         print(wlan.ifconfig())
+        print("Web server ready")
+        print("Server bound to", addr)
+        print("Open in browser:", "http://{}".format(wlan.ifconfig()[0]))
     elif led_state == 1 and not wlan.isconnected():
         led.value(0)
         led_state = 0
@@ -263,16 +266,7 @@ while True:
             cl.close()
             raise
         
-        if req.startswith("GET /data"):
-            # serve JSON
-            try:
-                with open("data.json", "r") as f:
-                    payload = f.read()
-            except Exception:
-                payload = "[]"
-            response = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\n\r\n" + payload
-            cl.send(response)
-        elif req.startswith("GET /reboot"):
+        if req.startswith("GET /reboot"):
             html = "<html><head><meta charset='utf-8'><title>Rebooting</title></head><body><h1>Rebooting...</h1></body></html>"
             headers = ("HTTP/1.1 200 OK\r\n"
                        "Content-Type: text/html; charset=utf-8\r\n"
@@ -324,7 +318,6 @@ while True:
                 '<tr><td>Uptime (sec)</td><td>%s</td></tr>'
                 '<tr><td>Chip temperature</td><td>%s °C</td></tr>'
                 '</table>'
-                '<a class="button" href="/data">View sensor log (JSON)</a>'
                 '<form action="/reboot" method="get" onsubmit="return confirm(\'Reboot Pico W now?\');" style="margin-top:12px">'
                 '  <button type="submit" style="padding:8px 12px;background:#ef4444;color:#fff;border:none;border-radius:6px;cursor:pointer;">'
                 '    Reboot device'
@@ -351,6 +344,6 @@ while True:
         pass
 
     # Rotate LCD mode
-    time.sleep(4)
+    time.sleep(6)
     idx = (idx + 1) % len(modes)
 
