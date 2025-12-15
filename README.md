@@ -22,12 +22,6 @@ This folder contains files used for storing credentials and sensor data:
 - **last_values.json** – Contains the most recent system state variables (e.g., chip temperature, device type, time, date, uptime, Wi-Fi status).  
   These values are saved so the system can restore or reference them after a reboot.
 
-### Images Folder (`/images`)
-This folder includes:
-- Screenshots of the local web server interface.  
-- Photos of the assembled hardware setup (Pico W, BME680 sensor, Grove LCD).  
-- Example management interface images (e.g., reboot button).
-
 ---
 ### Hardware Setup
 ![Hardware Photo 1](images/1000017518.jpg)
@@ -49,8 +43,8 @@ This folder includes:
 - Air quality calculation: Processes sensor data to determine AQI category.  
 - LCD display: Shows date/time, pressure, temperature, humidity, and AQI status.  
 - Local HTTP server:  
-  - Displays monitoring variables and recent sensor data points.  
-  - Provides management options (e.g., rebooting the Pico).  
+  - Displays monitoring variables.  
+  - Provides management options (rebooting the Pico).  
 
 ---
 
@@ -64,16 +58,6 @@ This folder includes:
 ## Web Interface
 The Pico W hosts a simple **HTTP server** accessible via the local network.  
 Features include:  
-- Real-time monitoring of sensor variables  
-- Viewing last recorded data points  
-- Rebooting the Pico remotely
-
-#### Dashboard
-![Dashboard](images/Dashboard.png)
-
-#### Data Page
-![Data Page](images/Data_page.png)
-
-#### Reboot Management
-![Reboot](images/Reboot.png)
+- Real-time monitoring of system  
+- Rebooting the Pico 
 
