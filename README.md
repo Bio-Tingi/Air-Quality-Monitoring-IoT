@@ -14,10 +14,13 @@ The system displays real-time data on the LCD and hosts a local **HTTP server** 
 - **main.py** – The primary application script that runs the indoor air quality monitoring system.
 - **bme680.py** – Driver for the BME680 sensor, handling temperature, humidity, pressure, and gas resistance readings.
 - **lcd_driver.py** – Driver for the Grove 16x2 LCD screen, managing I²C communication and display output.
+- **firebase_sync.py** -Firebase code for sync with database
 
 ### Data Folder (`/data`)
 This folder contains files used for storing credentials and sensor data:
 - **key.json** – Holds Wi-Fi credentials and other necessary configuration values for Pico W to connect to the internet.
+- **firebase_config.json** - Holds the config variables for the database Firebase
+- **pending_upload.json** - Stores the data waiting to be uploaded to the cloud
 - **data.json** – Stores the last recorded data points from the sensor for reference and logging.
 - **last_values.json** – Contains the most recent system state variables (e.g., chip temperature, device type, time, date, uptime, Wi-Fi status).  
   These values are saved so the system can restore or reference them after a reboot.
